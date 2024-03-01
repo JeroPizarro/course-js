@@ -92,3 +92,101 @@ x = Object.entries(todos[0]);
 x = todos[0].hasOwnProperty('id');
 
 console.log(x);
+
+//Direct variable injection
+const firstName = 'John';
+const lastName = 'Day';
+const age = 30;
+
+const persona = {
+  firstName,
+  lastName,
+  age,
+};
+
+console.log(`persona's age: ${persona.age}`);
+
+//Object literal destructuring
+
+const todo = {
+  id: 1,
+  heading: 'Buy groceries',
+  user: {
+    name: 'Charles',
+    lastName: 'Xavier',
+  },
+};
+
+const {
+  id: todoID,
+  heading,
+  user: { name, lastName: todoUserLastName },
+} = todo;
+
+console.log(todoID, heading, name, todoUserLastName);
+
+//Array literal destructuring
+
+const numbers = [22, 33, 55, 66, 77];
+const [first, second, thrid, ...rest] = numbers; //...rest operator can use any name
+
+console.log(first, second, thrid, rest);
+
+//JSON - js object notation, store data in human readable format
+
+const post = {
+  id: 1,
+  title: 'How to play Minecraft',
+  content:
+    'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Delectus natus voluptas quis modi ducimus nisi aperiam ullam molestias autem illo!',
+};
+
+//json to string
+const str = JSON.stringify(post);
+
+//string to object
+const obj = JSON.parse(str);
+
+console.log(obj);
+
+//Challenge
+
+const library = [
+  {
+    title: 'Harry Potter I',
+    author: 'J K Rowling',
+    status: {
+      own: true,
+      reading: false,
+      read: false,
+    },
+  },
+  {
+    title: 'The Lord of the Rings',
+    author: 'J R R Tolkien',
+    status: {
+      own: true,
+      reading: false,
+      read: false,
+    },
+  },
+  {
+    title: 'The Emperor Rises',
+    author: 'Henry Cavill',
+    status: {
+      own: true,
+      reading: false,
+      read: false,
+    },
+  },
+];
+
+library[0].status.read = true;
+library[1].status.read = true;
+library[2].status.read = true;
+
+const { title: firstBook } = library[0];
+
+const objectStr = JSON.stringify(library);
+
+console.log(firstBook);
