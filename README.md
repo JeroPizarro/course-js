@@ -7,4 +7,5 @@ Folder structure:
 - section-2: JS Basics. Variables, Types, Type Conversion & Coercion, Operators, Math object, Dates.
 - section-3: Arrays and Object Literals.
 - section-4: Functions, Scope & Execution Context.
+- section-5: Logic & Flow control. 
 - ...
