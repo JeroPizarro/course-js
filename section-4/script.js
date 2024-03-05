@@ -78,6 +78,8 @@ const createObj = () => ({
   name: 'John',
 }); //wrap {} with () to return objects
 
+//use () around the fcn body to implicitly return the result
+
 console.log(add(5, 8));
 console.log(subtract(8, 5));
 console.log(powTwo(3));
