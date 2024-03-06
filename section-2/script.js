@@ -1,3 +1,5 @@
+//use console.dir() to check props and methods
+
 // Type conversion
 
 let num = '100';
