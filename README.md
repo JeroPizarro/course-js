@@ -9,4 +9,5 @@ Folder structure:
   - section-4: Functions, Scope & Execution Context.
   - section-5: Logic & Flow control. 
   - section-6: Loops & High Order Array Methods.
+  - section-7: DOM.
   - ... 
