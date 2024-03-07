@@ -10,4 +10,5 @@ Folder structure:
   - section-5: Logic & Flow control. 
   - section-6: Loops & High Order Array Methods.
   - section-7: DOM.
+  - section-8: Events.
   - ... 
