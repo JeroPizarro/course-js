@@ -1,0 +1,6 @@
+1- if we don't have any item hide all the fields
+2- add items to list via form
+3- removing items from list by clicking the x button
+4- clear all items with 'clear' button
+5- filter the items by typing in the filter field
+6- ... 

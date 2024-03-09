@@ -11,4 +11,5 @@ Folder structure:
   - section-6: Loops & High Order Array Methods.
   - section-7: DOM.
   - section-8: Events.
+  - section-9: Shopping List mini project.
   - ... 
