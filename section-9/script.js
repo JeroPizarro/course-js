@@ -4,20 +4,58 @@
   const itemList = document.getElementById('item-list');
   const clearButton = document.getElementById('clear');
   const filterInput = document.getElementById('filter');
+  let isEditMode = false;
   let value;
 
-  submitButton.addEventListener('click', onSubmit);
-  itemList.addEventListener('click', onClick);
-  clearButton.addEventListener('click', clearAllItems);
-  filterInput.addEventListener('input', filterItems);
+  init();
 
-  checkUI();
+  function init() {
+    submitButton.addEventListener('click', onClick);
+    itemList.addEventListener('click', onClick);
+    itemList.addEventListener('dblclick', onClick);
+    clearButton.addEventListener('click', onClick);
+    filterInput.addEventListener('input', filterItems);
+    document.addEventListener('DOMContentLoaded', showStorageItems);
 
-  function onSubmit(e) {
-    e.preventDefault();
+    checkUI();
+  }
 
+  function showStorageItems() {
+    const items = getItemsFromStorage();
+    items.forEach((item) => insertNewItem(createNewItem(item)));
+    checkUI();
+  }
+
+  function onClick(e) {
+    if (e.currentTarget.classList.contains('btn')) {
+      e.preventDefault();
+
+      if (isEditMode) {
+        const itemToEdit = itemList.querySelector('.edit-mode');
+        deleteItem(itemToEdit);
+        addItem();
+        isEditMode = false;
+      } else {
+        if (checkDuplicates(itemInput.value)) {
+          alert('That item already exists!');
+        } else {
+          addItem();
+        }
+      }
+    } else if (e.target.parentElement.classList.contains('remove-item')) {
+      const parentLi = e.target.parentElement.parentElement;
+      deleteItem(parentLi);
+    } else if (e.target.id === 'clear') {
+      clearAllItems();
+    } else if (e.type === 'dblclick') {
+      editMode(e.target);
+    }
+  }
+
+  function addItem() {
     if (itemInput.value) {
       insertNewItem(createNewItem(itemInput.value));
+      addItemToStorage(itemInput.value);
       checkUI();
       itemInput.value = '';
     } else {
@@ -25,10 +63,22 @@
     }
   }
 
-  function onClick(e) {
-    if (e.target.className === 'fa-solid fa-xmark') {
-      removeItem(e.target);
-    }
+  function deleteItem(item) {
+    removeItemFromDOM(item);
+    removeItemFromStorage(item.textContent.trim());
+  }
+
+  function editMode(item) {
+    isEditMode = true;
+
+    itemList
+      .querySelectorAll('li')
+      .forEach((item) => item.classList.remove('edit-mode'));
+
+    item.classList.add('edit-mode');
+    submitButton.innerHTML = '<i class="fa-solid fa-pen"></i>    Update Item';
+    submitButton.style.backgroundColor = '#228B22';
+    itemInput.value = item.textContent.trim();
   }
 
   function filterItems(e) {
@@ -48,7 +98,10 @@
 
   function clearAllItems() {
     const items = itemList.querySelectorAll('li');
-    items.forEach((item) => item.remove());
+    items.forEach((item) => {
+      removeItemFromStorage(item.textContent.trim());
+      item.remove();
+    });
     checkUI();
   }
 
@@ -70,9 +123,8 @@
     itemList.appendChild(newItem);
   }
 
-  function removeItem(target) {
-    const currentItem = target.parentElement.parentElement;
-    currentItem.remove();
+  function removeItemFromDOM(item) {
+    item.remove();
     checkUI();
   }
 
@@ -85,5 +137,40 @@
       filterInput.style.display = 'block';
       clearButton.style.display = 'block';
     }
+
+    submitButton.innerHTML = '<i class="fa-solid fa-plus"></i> Add Item';
+    submitButton.style.backgroundColor = '#333';
+  }
+
+  function addItemToStorage(newItem) {
+    let storageItems = getItemsFromStorage();
+
+    storageItems.push(newItem);
+
+    localStorage.setItem('items', JSON.stringify(storageItems));
+  }
+
+  function getItemsFromStorage() {
+    let storageItems;
+
+    if (localStorage.getItem('items') === null) {
+      storageItems = [];
+    } else {
+      storageItems = JSON.parse(localStorage.getItem('items'));
+    }
+    return storageItems;
+  }
+
+  function removeItemFromStorage(item) {
+    let storageItems = getItemsFromStorage();
+
+    storageItems = storageItems.filter((sItem) => sItem !== item);
+
+    localStorage.setItem('items', JSON.stringify(storageItems));
+  }
+
+  function checkDuplicates(item) {
+    const itemsFromStorage = getItemsFromStorage();
+    return itemsFromStorage.includes(item);
   }
 })();

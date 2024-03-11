@@ -3,4 +3,5 @@
 3- removing items from list by clicking the x button
 4- clear all items with 'clear' button
 5- filter the items by typing in the filter field
-6- ... 
+6- implement localStorage
+7- create edit mode
