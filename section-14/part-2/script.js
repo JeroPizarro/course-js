@@ -72,7 +72,7 @@
     this.width = width;
     this.height = height;
   }
-  //Use obj create to create a new prototype obj using Shape's original prot and assing it to Rect2 prot.
+  //Use obj create to create a new prototype obj using Shape's original prot and assing it to Rect2 prot. Also is setting a new this scope.
   Rectangle2.prototype = Object.create(Shape.prototype);
 
   function Circle(name = 'default', radius = 0) {
