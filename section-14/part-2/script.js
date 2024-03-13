@@ -28,7 +28,7 @@
   );
   console.log(rect1);
 
-  //Alternative way
+  //Alternative way - Constructor fcn.
   const rectanglePrototypes = {
     area: function () {
       return this.width * this.height;
