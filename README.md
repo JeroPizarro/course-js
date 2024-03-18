@@ -12,6 +12,7 @@ Folder structure:
 - section-7: DOM.
 - section-8: Events.
 - section-9: Shopping List mini project.
+- section-10: Async JS.
 - ...
 - section-14: OOP.
 - section-15: OOP. Class sintax, getters & setters, etc.
