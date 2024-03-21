@@ -15,7 +15,7 @@
   fetch('http://api.github.com/users')
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
+      console.log('GitHub Users', data);
     });
 
   const generateButton = document.querySelector('button');
@@ -66,7 +66,6 @@
   };
 
   const changeBackground = (gender) => {
-    console.log(gender);
     if (gender === 'male') {
       document.body.classList.add('background-blue');
     } else {
@@ -76,4 +75,23 @@
 
   generateButton.addEventListener('click', getRandomUser);
   addEventListener('DOMContentLoaded', init);
+
+  // Using POST verb with Fetch. Using JSONPlaceholder API.
+  function createPost(post) {
+    fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: post.title,
+        body: post.body,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        token: 'abc123',
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => console.log('New Post data', data));
+  }
+
+  createPost({ title: 'My new post', body: 'This is the body.' });
 })();
