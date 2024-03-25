@@ -123,4 +123,33 @@
   };
 
   init();
+
+  //Fetch API error handling - httpstat.us
+
+  //Using catch to handle network errors
+  fetch('https://hello123.net')
+    .then((res) => res)
+    .then(() => console.log('success!'))
+    .catch((error) => console.log(error, 'Something is wrong'));
+
+  //Checking with res.ok
+  fetch('https://httpstat.us/404')
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(res.statusText);
+      }
+    })
+    .then(() => console.log('success!'))
+    //Error hanldled by catch
+    .catch((error) => console.log(error));
+
+  //Checking with status
+  fetch('https://httpstat.us/403')
+    .then((res) => {
+      if (res.status === 403) {
+        throw new Error('Forbidden Resource');
+      }
+    })
+    .then(() => console.log('success!'))
+    .catch((error) => console.log(error));
 })();
