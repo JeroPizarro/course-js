@@ -341,3 +341,15 @@ section h2 {
 .alert-error {
   background: red;
 }
+
+/* Backdrop Image */
+.backdrop-container {
+  background: no-repeat center/cover;
+  height: 100vh;
+  left: 0;
+  opacity: 0.1;
+  position: absolute;
+  top: 70px;
+  width: 100vw;
+  z-index: -1;
+}
