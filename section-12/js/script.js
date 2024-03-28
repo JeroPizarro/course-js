@@ -152,7 +152,76 @@
       </div>`;
     div.innerHTML = template;
     document.querySelector('#movie-details').append(div);
-    console.log(movieDetails);
+  };
+
+  const displayShowDetails = async () => {
+    const showId = window.location.search.slice(1);
+    const showDetails = await fetchData(`tv/${showId}`, 'GET');
+
+    displayBackdropImage('show', showDetails.backdrop_path);
+
+    const div = document.createElement('div');
+    const template = `
+      <div class="details-top">
+        <div>
+          ${
+            showDetails.poster_path
+              ? `<img
+            src="https://image.tmdb.org/t/p/w500/${showDetails.poster_path}"
+            class="card-img-top"
+            alt="${showDetails.name} poster"
+          />`
+              : `<img
+            src="images/no-image.jpg"
+            class="card-img-top"
+            alt="${showDetails.name} poster"
+          />`
+          }
+        </div>
+        <div>
+          <h2>${showDetails.name}</h2>
+          <p>
+            <i class="fas fa-star text-primary"></i>
+            ${showDetails.vote_average.toFixed(1)} / 10
+          </p>
+          <p class="text-muted">Last Air  Date: ${
+            showDetails.first_air_date
+          }</p>
+            ${showDetails.overview}
+          </p>
+          <h5>Genres</h5>
+          <ul class="list-group">
+            ${showDetails.genres
+              .map((genre) => `<li>${genre.name}</li>`)
+              .join('')}
+          </ul>
+          <a href="${
+            showDetails.homepage
+          }" target="_blank" class="btn">Visit Movie Homepage</a>
+        </div>
+      </div>
+      <div class="details-bottom">
+          <h2>Show Info</h2>
+          <ul>
+            <li><span class="text-secondary">Number Of Episodes:</span> ${
+              showDetails.number_of_episodes
+            }</li>
+            <li>
+              <span class="text-secondary">Last Episode To Air:</span> ${
+                showDetails.last_episode_to_air.name
+              }
+            </li>
+            <li><span class="text-secondary">Status:</span> ${
+              showDetails.status
+            }</li>
+          </ul>
+          <h4>Production Companies</h4>
+          <div class="list-group">${showDetails.production_companies
+            .map((company) => `<span>${company.name}</span>`)
+            .join(', ')}</div>
+        </div>`;
+    div.innerHTML = template;
+    document.querySelector('#show-details').append(div);
   };
 
   const displayBackdropImage = (type, backdropPath) => {
@@ -183,6 +252,19 @@
     return data;
   };
 
+  const displaySpinner = () => {
+    const { results } = fetchData('movie/now_playing', 'GET');
+    const template = `<div class="swiper-slide">
+    <a href="movie-details.html?id=1">
+      <img src="./images/no-image.jpg" alt="Movie Title" />
+    </a>
+    <h4 class="swiper-rating">
+      <i class="fas fa-star text-secondary"></i> 8 / 10
+    </h4>
+  </div>`;
+    console.log(results);
+  };
+
   const toggleSpinner = () => {
     document.querySelector('.spinner').classList.toggle('show');
   };
@@ -206,6 +288,7 @@
     switch (global.currentPage) {
       case global.basePath:
       case '/index.html':
+        //displaySpinner();
         displayPopularMovies();
         break;
 
@@ -214,7 +297,7 @@
         break;
 
       case global.showDetailPath:
-        console.log('tv-det');
+        displayShowDetails();
         break;
 
       case global.movieDetailPath:
