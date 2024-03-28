@@ -238,6 +238,24 @@
     }
   };
 
+  const imageHandler = (mediaItem) => {
+    let imgTemplate;
+    if (mediaItem.poster_path) {
+      imgTemplate = `<img
+        src="https://image.tmdb.org/t/p/w500/${mediaItem.poster_path}"
+        class="card-img-top"
+        alt="${mediaItem.name} poster"
+      />`;
+    } else {
+      imgTemplate = `<img
+        src="images/no-image.jpg"
+        class="card-img-top"
+        alt="${movieDetails.name} poster"
+      />`;
+    }
+    return imgTemplate;
+  };
+
   const fetchData = async (endpoint, httpVerb) => {
     toggleSpinner();
 
@@ -252,21 +270,60 @@
     return data;
   };
 
-  const displaySpinner = () => {
-    const { results } = fetchData('movie/now_playing', 'GET');
-    const template = `<div class="swiper-slide">
-    <a href="movie-details.html?id=1">
-      <img src="./images/no-image.jpg" alt="Movie Title" />
-    </a>
-    <h4 class="swiper-rating">
-      <i class="fas fa-star text-secondary"></i> 8 / 10
-    </h4>
-  </div>`;
-    console.log(results);
+  const displaySwiper = async () => {
+    const { results: actualMovies } = await fetchData(
+      'movie/now_playing',
+      'GET'
+    );
+
+    actualMovies.forEach((actualMovie) => {
+      const div = document.createElement('div');
+      div.classList.add('swiper-slide');
+
+      div.innerHTML = `
+        <div class="swiper-slide">
+          <a href="movie-details.html?id=${actualMovie.id}">
+            ${imageHandler(actualMovie)}
+          </a>
+          <h4 class="swiper-rating">
+            <i class="fas fa-star text-secondary"></i> ${actualMovie.vote_average.toFixed(
+              1
+            )} / 10
+          </h4>
+        </div>`;
+
+      document.querySelector('.swiper-wrapper').appendChild(div);
+    });
+
+    initSwiper();
   };
 
   const toggleSpinner = () => {
     document.querySelector('.spinner').classList.toggle('show');
+  };
+
+  const initSwiper = () => {
+    const swiper = new Swiper('.swiper', {
+      slidesPerView: 1,
+      spaceBetween: 30,
+      freeMode: true,
+      loop: true,
+      autoplay: {
+        delay: 4000,
+        disableOnInteraction: false,
+      },
+      breakpoints: {
+        500: {
+          slidesPerView: 2,
+        },
+        700: {
+          slidesPerView: 3,
+        },
+        1200: {
+          slidesPerView: 4,
+        },
+      },
+    });
   };
 
   const highlightActiveLink = () => {
@@ -288,7 +345,7 @@
     switch (global.currentPage) {
       case global.basePath:
       case '/index.html':
-        //displaySpinner();
+        displaySwiper();
         displayPopularMovies();
         break;
 

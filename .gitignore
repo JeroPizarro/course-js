@@ -5,6 +5,7 @@
 
 #Private rules
 notes.txt
+/.vscode
 
 # User-specific files
 *.rsuser
