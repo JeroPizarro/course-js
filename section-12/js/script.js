@@ -2,6 +2,16 @@
   const global = {
     currentPage: window.location.pathname,
     basePath: '/section-12/',
+    API_KEY: '4e5d6b9c93a4351d3a6125dc38e3a5a6',
+    API_URL: 'https://api.themoviedb.org/3/',
+
+    search: {
+      type: '',
+      term: '',
+      page: 1,
+      totalPages: 1,
+    },
+
     get showsPath() {
       //Using get to auto-reference properties with 'this'
       return this.basePath + 'shows.html';
@@ -9,7 +19,6 @@
     get movieDetailPath() {
       return this.basePath + 'movie-details.html';
     },
-
     get showDetailPath() {
       return this.basePath + 'tv-details.html';
     },
@@ -18,6 +27,7 @@
     },
   };
 
+  //Content
   const displayPopularMovies = async () => {
     const { results } = await fetchData('movie/popular', 'GET');
 
@@ -26,19 +36,7 @@
       div.setAttribute('class', 'card');
       div.innerHTML = `
         <a href="movie-details.html?${movie.id}">
-          ${
-            movie.poster_path
-              ? `<img
-            src="https://image.tmdb.org/t/p/w500/${movie.poster_path}"
-            class="card-img-top"
-            alt="${movie.title} poster"
-          />`
-              : `<img
-            src="images/no-image.jpg"
-            class="card-img-top"
-            alt="${movie.title} poster"
-          />`
-          }
+          ${imageHandler(movie)}
         </a>
         <div class="card-body">
           <h5 class="card-title">${movie.title}</h5>
@@ -59,19 +57,7 @@
       div.setAttribute('class', 'card');
       div.innerHTML = `
         <a href="tv-details.html?${show.id}">
-          ${
-            show.poster_path
-              ? `<img
-            src="https://image.tmdb.org/t/p/w500/${show.poster_path}"
-            class="card-img-top"
-            alt="${show.name} poster"
-          />`
-              : `<img
-            src="images/no-image.jpg"
-            class="card-img-top"
-            alt="${show.name} poster"
-          />`
-          }
+        ${imageHandler(show)}
         </a>
         <div class="card-body">
           <h5 class="card-title">${show.name}</h5>
@@ -85,7 +71,8 @@
   };
 
   const displayMovieDetails = async () => {
-    const movieId = window.location.search.slice(1);
+    const movieId = window.location.search.split('=')[1];
+    console.log(movieId);
     const movieDetails = await fetchData(`movie/${movieId}`, 'GET');
 
     displayBackdropImage('movie', movieDetails.backdrop_path);
@@ -94,19 +81,7 @@
     const template = `
       <div class="details-top">
         <div>
-          ${
-            movieDetails.poster_path
-              ? `<img
-            src="https://image.tmdb.org/t/p/w500/${movieDetails.poster_path}"
-            class="card-img-top"
-            alt="${movieDetails.name} poster"
-          />`
-              : `<img
-            src="images/no-image.jpg"
-            class="card-img-top"
-            alt="${movieDetails.name} poster"
-          />`
-          }
+        ${imageHandler(movieDetails)}
         </div>
         <div>
           <h2>${movieDetails.title}</h2>
@@ -164,19 +139,7 @@
     const template = `
       <div class="details-top">
         <div>
-          ${
-            showDetails.poster_path
-              ? `<img
-            src="https://image.tmdb.org/t/p/w500/${showDetails.poster_path}"
-            class="card-img-top"
-            alt="${showDetails.name} poster"
-          />`
-              : `<img
-            src="images/no-image.jpg"
-            class="card-img-top"
-            alt="${showDetails.name} poster"
-          />`
-          }
+        ${imageHandler(showDetails)}
         </div>
         <div>
           <h2>${showDetails.name}</h2>
@@ -238,29 +201,43 @@
     }
   };
 
-  const imageHandler = (mediaItem) => {
-    let imgTemplate;
-    if (mediaItem.poster_path) {
-      imgTemplate = `<img
-        src="https://image.tmdb.org/t/p/w500/${mediaItem.poster_path}"
-        class="card-img-top"
-        alt="${mediaItem.name} poster"
-      />`;
+  const search = () => {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    global.search.term = urlParams.get('search-term');
+    global.search.type = urlParams.get('type');
+
+    if (global.search.term !== '' && global.search.term !== null) {
+      if (global.search.type === 'movie') {
+        const results = searchFetchData();
+        displayMovieResults(results);
+      } else {
+        const results = searchFetchData();
+        displayShowResults(results);
+      }
     } else {
-      imgTemplate = `<img
-        src="images/no-image.jpg"
-        class="card-img-top"
-        alt="${movieDetails.name} poster"
-      />`;
+      if (global.search.type === 'movie') {
+        showAlert(`${global.search.term} not found in Movies`);
+      } else {
+        showAlert(`${global.search.term} not found in TV Shows`);
+      }
     }
-    return imgTemplate;
   };
 
+  const displayMovieResults = async (results) => {
+    console.log(await results);
+  };
+  const displayShowResults = async (results) => {
+    console.log(await results);
+  };
+
+  //Utilities
   const fetchData = async (endpoint, httpVerb) => {
     toggleSpinner();
 
-    const API_KEY = '4e5d6b9c93a4351d3a6125dc38e3a5a6';
-    const API_URL = 'https://api.themoviedb.org/3/';
+    const API_KEY = global.API_KEY;
+    const API_URL = global.API_URL;
     const res = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}`, {
       method: `${httpVerb}`,
     });
@@ -268,6 +245,36 @@
 
     toggleSpinner();
     return data;
+  };
+
+  const searchFetchData = async () => {
+    toggleSpinner();
+
+    const res = await fetch(
+      `${global.API_URL}search/${global.search.type}?api_key=${global.API_KEY}&language=en-US&query=${global.search.term}`
+    );
+    const data = await res.json();
+
+    toggleSpinner();
+    return data;
+  };
+
+  const toggleSpinner = () => {
+    document.querySelector('.spinner').classList.toggle('show');
+  };
+
+  const highlightActiveLink = () => {
+    const headerLinks = document.querySelectorAll('.nav-link');
+    headerLinks.forEach((link) => {
+      const linkHref = link.getAttribute('href');
+      if (linkHref === global.currentPage) {
+        link.classList.toggle('active');
+      }
+    });
+  };
+
+  const addCommasToNumbers = (number) => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
   const displaySwiper = async () => {
@@ -298,10 +305,36 @@
     initSwiper();
   };
 
-  const toggleSpinner = () => {
-    document.querySelector('.spinner').classList.toggle('show');
+  const imageHandler = (mediaItem) => {
+    let imgTemplate;
+    if (mediaItem.poster_path) {
+      imgTemplate = `<img
+        src="https://image.tmdb.org/t/p/w500/${mediaItem.poster_path}"
+        class="card-img-top"
+        alt="${mediaItem.name ? mediaItem.name : mediaItem.title} poster"
+      />`;
+    } else {
+      imgTemplate = `<img
+        src="images/no-image.jpg"
+        class="card-img-top"
+        alt="${mediaItem.name ? mediaItem.name : mediaItem.title} poster"
+      />`;
+    }
+    return imgTemplate;
   };
 
+  const showAlert = (msg, className) => {
+    const alertEl = document.createElement('div');
+    alertEl.classList.add('alert', className);
+    alertEl.appendChild(document.createTextNode(msg));
+    document.querySelector('#alert').appendChild(alertEl);
+
+    setTimeout(() => {
+      alertEl.remove();
+    }, 4000);
+  };
+
+  //3rd-party
   const initSwiper = () => {
     const swiper = new Swiper('.swiper', {
       slidesPerView: 1,
@@ -326,20 +359,7 @@
     });
   };
 
-  const highlightActiveLink = () => {
-    const headerLinks = document.querySelectorAll('.nav-link');
-    headerLinks.forEach((link) => {
-      const linkHref = link.getAttribute('href');
-      if (linkHref === global.currentPage) {
-        link.classList.toggle('active');
-      }
-    });
-  };
-
-  const addCommasToNumbers = (number) => {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  };
-
+  //Router
   const init = () => {
     //Router - exec diffetent js in each page
     switch (global.currentPage) {
@@ -362,7 +382,7 @@
         break;
 
       case global.searchPath:
-        console.log('search');
+        search();
         break;
     }
 
