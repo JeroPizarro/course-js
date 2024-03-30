@@ -13,7 +13,10 @@ Folder structure:
 - section-8: Events.
 - section-9: Shopping List mini project.
 - section-10: Async JS.
+- section-11: Fetch API. Async & Await.
+- section-12: Flixx Project.
 - ...
 - section-14: OOP.
 - section-15: OOP. Class sintax, getters & setters, etc.
+- section-16: Tracalorie Project. OOP.
 - ...
