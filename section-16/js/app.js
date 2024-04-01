@@ -56,6 +56,30 @@ class CalorieTracker {
     this.#displayNewWorkout(workout);
   }
 
+  removeMeal(mealId) {
+    const index = this.#meals.findIndex((meal) => meal.id === mealId);
+
+    if (index !== -1) {
+      const mealToRemove = this.#meals[index];
+      this.#totalCalories -= mealToRemove.calories;
+      this.#meals.splice(index, 1);
+      this.#render();
+    }
+  }
+
+  removeWorkout(workoutId) {
+    const index = this.#workouts.findIndex(
+      (workout) => workout.id === workoutId
+    );
+
+    if (index !== -1) {
+      const workoutToRemove = this.#workouts[index];
+      this.#totalCalories += workoutToRemove.calories;
+      this.#workouts.splice(index, 1);
+      this.#render();
+    }
+  }
+
   //Private
   #render() {
     this.#displayCaloriesTotal();
@@ -192,6 +216,12 @@ class App {
     document
       .querySelector('#workout-form')
       .addEventListener('submit', this.#newItem.bind(this, 'workout'));
+    document
+      .querySelector('#meal-items')
+      .addEventListener('click', this.#clickHandler.bind(this, 'meal'));
+    document
+      .querySelector('#workout-items')
+      .addEventListener('click', this.#clickHandler.bind(this, 'workout'));
   }
 
   //.bind() argument comes first than evt.
@@ -217,6 +247,21 @@ class App {
     new bootstrap.Collapse(document.querySelector(`#collapse-${type}`), {
       toggle: true,
     });
+  }
+
+  #clickHandler(type, e) {
+    if (
+      e.target.classList.contains('delete') ||
+      e.target.classList.contains('fa-xmark')
+    ) {
+      const cardToRemove = e.target.closest('.card');
+      const id = cardToRemove.dataset.id;
+
+      type === 'meal'
+        ? this.#tracker.removeMeal(id)
+        : this.#tracker.removeWorkout(id);
+      cardToRemove.remove();
+    }
   }
 }
 
