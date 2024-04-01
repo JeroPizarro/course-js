@@ -46,12 +46,14 @@ class CalorieTracker {
     this.#meals.push(meal);
     this.#totalCalories += meal.calories;
     this.#render();
+    this.#displayNewMeal(meal);
   }
 
   addWorkout(workout) {
     this.#workouts.push(workout);
     this.#totalCalories -= workout.calories;
     this.#render();
+    this.#displayNewWorkout(workout);
   }
 
   //Private
@@ -125,6 +127,42 @@ class CalorieTracker {
     const width = Math.min(percentage, 100);
     progressEl.style.width = `${width}%`;
   }
+
+  #displayNewMeal(meal) {
+    const mealsEl = document.querySelector('#meal-items');
+    mealsEl.appendChild(this.#createNewCard(meal));
+  }
+
+  #displayNewWorkout(workout) {
+    const workoutsEl = document.querySelector('#workout-items');
+    workoutsEl.appendChild(this.#createNewCard(workout));
+  }
+
+  #createNewCard(dataEl) {
+    const card = document.createElement('div');
+    const cardTemplate = `
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <h4 class="mx-1">${dataEl.name}</h4>
+          <div
+            class="fs-1  text-white text-center rounded-2 px-2 px-sm-5 ${
+              dataEl instanceof Meal ? 'bg-primary' : 'bg-secondary'
+            }"
+          >
+            ${dataEl.calories}
+          </div>
+          <button class="delete btn btn-danger btn-sm mx-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+    card.classList.add('card', 'my-2');
+    card.setAttribute('data-id', dataEl.id);
+    card.innerHTML = cardTemplate;
+    return card;
+  }
 }
 
 class Meal {
@@ -143,7 +181,43 @@ class Workout {
   }
 }
 
-const tracker = new CalorieTracker();
-tracker.addMeal(new Meal('breakfast', 400));
-tracker.addMeal(new Meal('breakfast', 3750));
-tracker.addWorkout(new Workout('run', 320));
+class App {
+  #tracker = null;
+
+  constructor() {
+    this.#tracker = new CalorieTracker();
+    document
+      .querySelector('#meal-form')
+      .addEventListener('submit', this.#newItem.bind(this, 'meal'));
+    document
+      .querySelector('#workout-form')
+      .addEventListener('submit', this.#newItem.bind(this, 'workout'));
+  }
+
+  //.bind() argument comes first than evt.
+  #newItem(type, e) {
+    e.preventDefault();
+
+    const name = document.querySelector(`#${type}-name`);
+    const calories = document.querySelector(`#${type}-calories`);
+
+    if (name.value === '' || calories.value === '') {
+      alert('Please fill all fields');
+    }
+
+    if (type === 'meal') {
+      this.#tracker.addMeal(new Meal(name.value, +calories.value));
+    } else {
+      this.#tracker.addWorkout(new Workout(name.value, +calories.value));
+    }
+
+    name.value = '';
+    calories.value = '';
+
+    new bootstrap.Collapse(document.querySelector(`#collapse-${type}`), {
+      toggle: true,
+    });
+  }
+}
+
+const app = new App();
