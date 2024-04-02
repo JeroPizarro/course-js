@@ -80,6 +80,19 @@ class CalorieTracker {
     }
   }
 
+  reset() {
+    this.totalCalories = 0;
+    this.#meals = [];
+    this.#workouts = [];
+    this.#render();
+  }
+
+  setCalorieLimit(newCalorieLimit) {
+    this.calorieLimit = newCalorieLimit;
+    this.#displayCaloriesLimit();
+    this.#render();
+  }
+
   //Private
   #render() {
     this.#displayCaloriesTotal();
@@ -222,6 +235,18 @@ class App {
     document
       .querySelector('#workout-items')
       .addEventListener('click', this.#clickHandler.bind(this, 'workout'));
+    document
+      .querySelector('#filter-meals')
+      .addEventListener('keyup', this.#filterItems.bind(this, 'meal'));
+    document
+      .querySelector('#filter-workouts')
+      .addEventListener('keyup', this.#filterItems.bind(this, 'workout'));
+    document
+      .querySelector('#reset')
+      .addEventListener('click', this.#reset.bind(this));
+    document
+      .querySelector('#limit-form')
+      .addEventListener('submit', this.#setLimit.bind(this));
   }
 
   //.bind() argument comes first than evt.
@@ -233,12 +258,16 @@ class App {
 
     if (name.value === '' || calories.value === '') {
       alert('Please fill all fields');
+      //use return to get out of the fcn if fields are empty
+      return;
     }
 
     if (type === 'meal') {
       this.#tracker.addMeal(new Meal(name.value, +calories.value));
+      this.#toggleEnabledFilter(type);
     } else {
       this.#tracker.addWorkout(new Workout(name.value, +calories.value));
+      this.#toggleEnabledFilter(type);
     }
 
     name.value = '';
@@ -260,8 +289,62 @@ class App {
       type === 'meal'
         ? this.#tracker.removeMeal(id)
         : this.#tracker.removeWorkout(id);
+
       cardToRemove.remove();
+
+      //Filter validation
+      if (document.querySelectorAll(`#${type}-items .card`).length === 0) {
+        this.#toggleEnabledFilter(type);
+      }
     }
+  }
+
+  #toggleEnabledFilter(type) {
+    const filter = document.querySelector(`#filter-${type}s`);
+    filter.toggleAttribute('disabled');
+  }
+
+  #disableAllFilters() {
+    //using Substring matching attribute selectors
+    const filters = document.querySelectorAll(`input[id^=filter]`);
+    filters.forEach((filter) => {
+      filter.value = '';
+      filter.disabled = true;
+    });
+  }
+
+  #filterItems(type, e) {
+    const text = e.target.value.toLowerCase();
+    document.querySelectorAll(`#${type}-items .card`).forEach((card) => {
+      const name =
+        card.firstElementChild.firstElementChild.textContent.toLowerCase();
+      if (name.indexOf(text) !== -1) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  #reset() {
+    this.#tracker.reset();
+    document.querySelector('#meal-items').innerHTML = '';
+    document.querySelector('#workout-items').innerHTML = '';
+    this.#disableAllFilters();
+  }
+
+  #setLimit(e) {
+    e.preventDefault();
+    const limit = document.querySelector('#limit');
+    if (limit === '') {
+      alert('Please add a correct value.');
+      return;
+    }
+    this.#tracker.setCalorieLimit(+limit.value);
+    limit.value = '';
+
+    //close modal
+    bootstrap.Modal.getInstance(document.querySelector('#limit-modal')).hide();
   }
 }
 
