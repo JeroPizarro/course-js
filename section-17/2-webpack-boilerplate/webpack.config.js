@@ -24,7 +24,7 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       {
         test: /\.js$/,
@@ -35,10 +35,6 @@ module.exports = {
             presets: ['@babel/preset-env'],
           },
         },
-      },
-      {
-        test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
     ],
   },
